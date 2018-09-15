@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "algorithm",
+                "projectName": "algorithm",
+                "workingDirectory": "c:\\Users\\27251\\Documents\\Project\\algorithm",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "algorithm",
+                "projectName": "algorithm",
+                "workingDirectory": "c:\\Users\\27251\\Documents\\Project\\algorithm",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}

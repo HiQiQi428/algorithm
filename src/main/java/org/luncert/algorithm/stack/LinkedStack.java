@@ -43,6 +43,28 @@ public class LinkedStack<E> implements Stack<E> {
     public boolean isEmpty() { return size == 0; }
 
     /**
+     * 逐队反转，实现倒置
+     */
+    public void reverse() {
+        if (size > 1) {
+            Node<E> cur = top.next, pre = top, tmp;
+            pre.next = null;
+            for (int i = 1; ; i++) {
+                tmp = cur.next;
+                cur.next = pre;
+                if (i < size - 1) {
+                    pre = cur;
+                    cur = tmp;
+                }
+                else {
+                    top = cur;
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * 从栈顶开始遍历输出所有元素
      */
     public String toString() {

@@ -11,5 +11,7 @@ public interface Stack<E> extends Iterable<E> {
     int size();
 
     boolean isEmpty();
+
+    void reverse();
     
 }

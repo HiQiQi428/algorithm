@@ -3,7 +3,7 @@ package org.luncert.algorithm.queue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedQueue<E> implements Iterable<E> {
+public class LinkedQueue<E> implements Queue<E> {
 
     private static class Node<E> {
         E data;
@@ -44,6 +44,10 @@ public class LinkedQueue<E> implements Iterable<E> {
         tail = tail.next;
         size--;
         return data;
+    }
+
+    public void reverse() {
+        
     }
 
     /**

@@ -169,17 +169,17 @@ public class CyclicLinkedList<E> implements List<E> {
     }
 
     @Override
-    public void sort(BiFunction<E, E, Boolean> compare) {
+    public void sort(BiFunction<E, E, E> max) {
 
 	}
 
     @Override
-    public E max(BiFunction<E, E, Boolean> compare) {
+    public E max(BiFunction<E, E, E> max) {
         return null;
     }
 
     @Override
-    public E min(BiFunction<E, E, Boolean> compare) {
+    public E min(BiFunction<E, E, E> min) {
         return null;
     }
 

@@ -85,10 +85,16 @@ public class LinkedList<E> implements List<E> {
     public E set(int index, E data) {
         indexCheck(index);
         E oldValue;
-        Node<E> tmp = head;
-        for (int i = 0; i <= index; i++, tmp = tmp.next);
-        oldValue = tmp.data;
-        tmp.data = data;
+        if (index == size - 1) {
+            oldValue = tail.data;
+            tail.data = data;
+        }
+        else {
+            Node<E> tmp = head;
+            for (int i = 0; i <= index; i++, tmp = tmp.next);
+            oldValue = tmp.data;
+            tmp.data = data;
+        }
         return oldValue;
     }
 
@@ -107,6 +113,8 @@ public class LinkedList<E> implements List<E> {
 
     public E get(int index) {
         indexCheck(index);
+        if (index == size - 1)
+            return tail.data;
         Node<E> tmp = head;
         for (int i = 0; i < index + 1; i++, tmp = tmp.next);
         return tmp.data;
@@ -131,8 +139,19 @@ public class LinkedList<E> implements List<E> {
         return (i = builder.length()) > 1 ? builder.replace(i - 1, i, "]").toString() : "[]";
     }
 
-    public Iterator<E> iterator() {
-        return null;
+    public Iterator<E> iterator() { return new Itr(); }
+
+    private class Itr implements Iterator<E> {
+
+        Node<E> node = head;
+
+        public boolean hasNext() { return node.next != null; }
+
+        public E next() {
+            node = node.next;
+            return node.data;
+        }
+
     }
 
     /**
@@ -163,15 +182,13 @@ public class LinkedList<E> implements List<E> {
         return null;
     }
 
-    public void sort(BiFunction<E, E, Boolean> compare) {}
+    public void sort(BiFunction<E, E, E> max) {}
 
-    @Override
-    public E max(BiFunction<E, E, Boolean> compare) {
+    public E max(BiFunction<E, E, E> max) {
         return null;
     }
 
-    @Override
-    public E min(BiFunction<E, E, Boolean> compare) {
+    public E min(BiFunction<E, E, E> min) {
         return null;
     }
 

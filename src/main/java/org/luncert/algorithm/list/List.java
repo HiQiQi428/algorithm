@@ -22,10 +22,10 @@ public interface List<E> extends Iterable<E> {
     
     void clear();
     
-    E max(BiFunction<E, E, Boolean> compare);
+    E max(BiFunction<E, E, E> max);
 
-    E min(BiFunction<E, E, Boolean> compare);
+    E min(BiFunction<E, E, E> max);
     
-    void sort(BiFunction<E, E, Boolean> compare);
+    void sort(BiFunction<E, E, E> min);
 
 }

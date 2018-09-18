@@ -2,16 +2,15 @@ package org.luncert.algorithm.tree;
 
 public abstract class Tree<E> implements Iterable<E> {
 
-    protected static class Node<E> {
+    protected static abstract class Node<E> {
         E data;
-        Node<E> lc; // 左孩子
-        Node<E> rc; // 右孩子
         Node(E data) {
             this.data = data;
         }
-        public String toString() {
-            return "TreeNode[data: " + data + ", lc: " + lc + ", rc: " + rc+ "]";
-        }
+        abstract public Node<E> getLeftChild();
+        abstract public void setLeftChild(Node<E> leftChild);
+        abstract public Node<E> getRightChild();
+        abstract public void setRightChild(Node<E> rightChild);
     }
 
     public abstract E maxItem();
@@ -20,6 +19,9 @@ public abstract class Tree<E> implements Iterable<E> {
 
     public abstract void add(E data);
 
+    /**
+     * 删除子树
+     */
     public abstract E remove(E data);
 
     public abstract Node<E> find(E data);
@@ -33,11 +35,13 @@ public abstract class Tree<E> implements Iterable<E> {
     public abstract Node<E> getRoot();
 
     /**
-     * 寻找最深的节点
-     * @return
+     * @return 最深的节点
      */
     public abstract Node<E> deepestNode();
 
+    /**
+     * @return 树的直径
+     */
     public abstract int diameter();
 
     /**
@@ -46,10 +50,9 @@ public abstract class Tree<E> implements Iterable<E> {
     public abstract E maxLayerSum();
 
     /**
-     * 最近公共组先
-     * @return 节点
+     * @return 最近公共祖先
      */
-    public abstract Node<E> publicAncestor(Node<?>... nodes);
+    public abstract Node<E> lca(Node<E> a, Node<E> b);
 
     /**
      * 比较两棵树结构是否相同

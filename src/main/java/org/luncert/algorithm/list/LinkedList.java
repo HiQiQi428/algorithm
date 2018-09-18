@@ -21,6 +21,15 @@ public class LinkedList<E> implements List<E> {
         tail = head = new Node<>(null);
     }
 
+    /**
+     * 根据数组构建链表
+     */
+    public LinkedList(E[] seq) {
+        this();
+        for (E data : seq)
+            add(data);
+    }
+
     public void add(E data) {
         tail = tail.next = new Node<>(data);
         size++;

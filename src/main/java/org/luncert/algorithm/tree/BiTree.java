@@ -1,5 +1,6 @@
 package org.luncert.algorithm.tree;
 
+import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
@@ -8,20 +9,53 @@ import org.luncert.algorithm.queue.Queue;
 
 public class BiTree<E> extends Tree<E> {
 
-    private Node<E> root;
+    private BiNode<E> root;
     private int size;
     private int diameter;
     private BiFunction<E, E, E> max;
     private BiFunction<E, E, E> add;
 
+    private static class BiNode<E> extends Tree.Node<E> {
+        BiNode<E> lc, rc;
+        BiNode(E data) { super(data); }
+        public Node<E> getLeftChild() { return lc; }
+        public Node<E> getRightChild() { return rc; }
+        public void setLeftChild(Node<E> leftChild) {
+            if (leftChild instanceof BiNode)
+                this.lc = (BiNode<E>)leftChild;
+            else
+                throw new InvalidParameterException();
+        }
+        public void setRightChild(Node<E> rightChild) {
+            if (rightChild instanceof BiNode)
+                this.rc = (BiNode<E>)rightChild;
+            else
+                throw new InvalidParameterException();
+        }
+
+    }
+
     public BiTree() {}
+
+    /**
+     * 前序遍历数组构建二叉树
+     */
+    public BiTree(E[] seq) {
+        this(seq, null, null);
+    }
 
     public BiTree(BiFunction<E, E, E> max, BiFunction<E, E, E> add) {
         this.max = max;
         this.add = add;
     }
 
-    private E maxItem(Node<E> node) {
+    public BiTree(E[] seq, BiFunction<E, E, E> max, BiFunction<E, E, E> add) {
+        this(max, add);
+        for (E data : seq)
+            add(data);
+    }
+
+    private E maxItem(BiNode<E> node) {
         if (node.lc != null) {
             E tmp = max.apply(maxItem(node.lc), node.data);
             return node.rc == null ? tmp : max.apply(maxItem(node.rc), tmp);
@@ -47,8 +81,8 @@ public class BiTree<E> extends Tree<E> {
      */
     public E search(E elem) {
         if (root != null) {
-            Node<E> node;
-            Queue<Node<E>> q = new LinkedQueue<>();
+            BiNode<E> node;
+            Queue<BiNode<E>> q = new LinkedQueue<>();
             q.enQueue(root);
             while (!q.isEmpty()) {
                 node = q.deQueue();
@@ -68,10 +102,10 @@ public class BiTree<E> extends Tree<E> {
      * @param elem
      */
     public void add(E elem) {
-        Node<E> newNode = new Node<>(elem);
+        BiNode<E> newNode = new BiNode<>(elem);
         if (root != null) {
-            Node<E> node;
-            Queue<Node<E>> q = new LinkedQueue<>();
+            BiNode<E> node;
+            Queue<BiNode<E>> q = new LinkedQueue<>();
             q.enQueue(root);
             while (!q.isEmpty()) {
                 node = q.deQueue();
@@ -102,6 +136,14 @@ public class BiTree<E> extends Tree<E> {
 
     public Node<E> getRoot() { return root; }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder().append("BiTree-DLR[");
+        for (E data : this)
+            builder.append(data).append(',');
+        int i;
+        return (i = builder.length()) > 1 ? builder.replace(i - 1, i, "]").toString() : "[]";
+    }
+
     /**
      * @return 前序遍历迭代器
      */
@@ -109,7 +151,7 @@ public class BiTree<E> extends Tree<E> {
 
     private class DLRItr implements Iterator<E> {
 
-        LinkedQueue<Node<E>> q;
+        LinkedQueue<BiNode<E>> q;
 
         DLRItr() {
             q = new LinkedQueue<>();
@@ -119,7 +161,7 @@ public class BiTree<E> extends Tree<E> {
         public boolean hasNext() { return !q.isEmpty(); }
 
         public E next() {
-            Node<E> node = q.deQueue();
+            BiNode<E> node = q.deQueue();
             if (node.lc != null)
                 q.enQueue(node.lc);
             if (node.rc != null)
@@ -129,7 +171,7 @@ public class BiTree<E> extends Tree<E> {
         
     }
 
-    private int height(Node<E> node) {
+    private int height(BiNode<E> node) {
         if (node.lc != null) {
             int lh = height(node.lc);
             return node.rc != null ? 1 + Math.max(lh, height(node.rc)) : 1 + lh;                
@@ -145,8 +187,8 @@ public class BiTree<E> extends Tree<E> {
     public Node<E> deepestNode() {
         if (root != null) {
             int deepestLevel = -1, level = -1;
-            Node<E> deepestNode = null, node = null;
-            Queue<Node<E>> q = new LinkedQueue<>();
+            BiNode<E> deepestNode = null, node = null;
+            Queue<BiNode<E>> q = new LinkedQueue<>();
             q.enQueue(root);
             while (!q.isEmpty()) {
                 level++;
@@ -172,7 +214,7 @@ public class BiTree<E> extends Tree<E> {
     private int diameter(Node<E> node) {
         if (node == null)
             return 0;
-        int left = diameter(node.lc), right = diameter(node.rc);
+        int left = diameter(node.getLeftChild()), right = diameter(node.getRightChild());
         if (left + right > diameter)
             diameter = left + right;
         return Math.max(left, right) + 1;
@@ -194,8 +236,8 @@ public class BiTree<E> extends Tree<E> {
         E ret = root.data, tmp = null;
         // i 表示所在层还有几个节点在队列中,k 表示所在层的容量
         int i = 1, k = 1;
-        Node<E> node;
-        Queue<Node<E>> q = new LinkedQueue<>();
+        BiNode<E> node;
+        Queue<BiNode<E>> q = new LinkedQueue<>();
         q.enQueue(root);
         while (!q.isEmpty()) {
             i--;
@@ -221,24 +263,92 @@ public class BiTree<E> extends Tree<E> {
         return ret;
     }
 
+    private int remove(BiNode<E> node) {
+        int size = 0;
+        if (node.lc != null) {
+            size += remove(node.lc);
+            node.lc = null;
+        }
+        if (node.rc != null) {
+            size += remove(node.rc);
+            node.rc = null;
+        }
+        return size + 1;
+    }
+
     public E remove(E data) {
-        return null;
+        if (root.data == data || root.data.equals(data))
+            clear();
+        E tmp = null;
+        BiNode<E> node;
+        Queue<BiNode<E>> q = new LinkedQueue<>();
+        q.enQueue(root);
+        while (!q.isEmpty()) {
+            node = q.deQueue();
+            if (node.lc != null) {
+                tmp = node.lc.data;
+                if (tmp == data || tmp.equals(data)) {
+                    size -= remove(node.lc);
+                    node.lc = null;
+                    break;
+                }
+                q.enQueue(node.lc);
+            }
+            if (node.rc != null) {
+                tmp = node.rc.data;
+                if (tmp == data || tmp.equals(data)) {
+                    size -= remove(node.rc);
+                    node.rc = null;
+                    break;
+                }
+                q.enQueue(node.rc);
+            }
+        }
+        return tmp;
+    }
+
+    private Node<E> find(BiNode<E> node, E data) {
+        Node<E> ret = null;
+        if (node != null) {
+            if (node.data == data || node.data.equals(data)) ret = node;
+            else {
+                ret = find(node.lc, data);
+                if (ret == null)
+                ret = find(node.rc, data);
+            }
+        }
+        return ret;
+
     }
 
     public Node<E> find(E data) {
-        return null;
+        return find(root, data);
     }
 
-    public Node<E> publicAncestor(Node<?>... nodes) {
-        return null;
+    private Node<E> lca(BiNode<E> node, BiNode<E> a, BiNode<E> b) {
+        if (node == null || node == a || node == b)
+            return node;
+        Node<E> x = lca(node.lc, a, b), y = lca(node.rc, a, b);
+        if (x != null && y != null) return node; // 返回 node 作为公共祖先
+        else return x != null ? x : y; // 传递结果
     }
 
-    private boolean equals(Node<E> a, Node<E> b) {
+    public Node<E> lca(Node<E> a, Node<E> b) {
+        if (a instanceof BiNode && b instanceof BiNode)
+            return lca(root, (BiNode<E>)a, (BiNode<E>)b);
+        else
+            throw new InvalidParameterException();
+    }
+
+    private boolean equals(BiNode<E> a, BiNode<E> b) {
         return a == null && b == null || equals(a.lc, b.lc) || equals(a.rc, b.rc);
     }
 
     public boolean equals(Tree<E> anotherTree) {
-        return equals(root, anotherTree.getRoot());
+        if (anotherTree instanceof BiTree)
+            return equals(root, (BiNode<E>)anotherTree.getRoot());
+        else
+            throw new InvalidParameterException();
     }
 
 }

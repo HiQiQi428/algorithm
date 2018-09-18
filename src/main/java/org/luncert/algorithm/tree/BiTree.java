@@ -1,13 +1,12 @@
 package org.luncert.algorithm.tree;
 
-import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
 import org.luncert.algorithm.queue.LinkedQueue;
 import org.luncert.algorithm.queue.Queue;
 
-public class BiTree<E> extends Tree<E> {
+public class BiTree<E> implements Iterable<E> {
 
     private BiNode<E> root;
     private int size;
@@ -15,24 +14,15 @@ public class BiTree<E> extends Tree<E> {
     private BiFunction<E, E, E> max;
     private BiFunction<E, E, E> add;
 
-    private static class BiNode<E> extends Tree.Node<E> {
+    public static class BiNode<E> {
+        E data;
         BiNode<E> lc, rc;
-        BiNode(E data) { super(data); }
-        public Node<E> getLeftChild() { return lc; }
-        public Node<E> getRightChild() { return rc; }
-        public void setLeftChild(Node<E> leftChild) {
-            if (leftChild instanceof BiNode)
-                this.lc = (BiNode<E>)leftChild;
-            else
-                throw new InvalidParameterException();
+        BiNode(E data) { this.data = data; }
+        public String toString() {
+            return "BiTree#BiNode{data: " + data +
+                ", lc: " + (lc != null ? lc.hashCode() : null) +
+                ", rc: " + (rc != null ? rc.hashCode() : null) + "]";
         }
-        public void setRightChild(Node<E> rightChild) {
-            if (rightChild instanceof BiNode)
-                this.rc = (BiNode<E>)rightChild;
-            else
-                throw new InvalidParameterException();
-        }
-
     }
 
     public BiTree() {}
@@ -134,7 +124,7 @@ public class BiTree<E> extends Tree<E> {
 
     public int size() { return size; }
 
-    public Node<E> getRoot() { return root; }
+    public BiNode<E> getRoot() { return root; }
 
     public String toString() {
         StringBuilder builder = new StringBuilder().append("BiTree-DLR[");
@@ -184,7 +174,10 @@ public class BiTree<E> extends Tree<E> {
 
     public int height() { return height(root); }
 
-    public Node<E> deepestNode() {
+    /**
+     * @return 最深的节点
+     */
+    public BiNode<E> deepestNode() {
         if (root != null) {
             int deepestLevel = -1, level = -1;
             BiNode<E> deepestNode = null, node = null;
@@ -211,10 +204,10 @@ public class BiTree<E> extends Tree<E> {
      * @param node
      * @return 子树高度
      */
-    private int diameter(Node<E> node) {
+    private int diameter(BiNode<E> node) {
         if (node == null)
             return 0;
-        int left = diameter(node.getLeftChild()), right = diameter(node.getRightChild());
+        int left = diameter(node.lc), right = diameter(node.rc);
         if (left + right > diameter)
             diameter = left + right;
         return Math.max(left, right) + 1;
@@ -222,12 +215,16 @@ public class BiTree<E> extends Tree<E> {
 
     /**
      * 求树直径,即树中最长路径的两个叶节点间的节点数,即高度最高的两棵子树的高度和+1
+     * @return 树的直径
      */
     public int diameter() {
         diameter(root);
         return diameter;
     }
 
+    /**
+     * @return 和最大层的和
+     */
     public E maxLayerSum() {
         if (max == null)
             throw new RuntimeException("BiFunction<E, E, E> max cannot be null");
@@ -276,6 +273,9 @@ public class BiTree<E> extends Tree<E> {
         return size + 1;
     }
 
+    /**
+     * 删除子树
+     */
     public E remove(E data) {
         if (root.data == data || root.data.equals(data))
             clear();
@@ -307,8 +307,8 @@ public class BiTree<E> extends Tree<E> {
         return tmp;
     }
 
-    private Node<E> find(BiNode<E> node, E data) {
-        Node<E> ret = null;
+    private BiNode<E> find(BiNode<E> node, E data) {
+        BiNode<E> ret = null;
         if (node != null) {
             if (node.data == data || node.data.equals(data)) ret = node;
             else {
@@ -321,34 +321,36 @@ public class BiTree<E> extends Tree<E> {
 
     }
 
-    public Node<E> find(E data) {
+    public BiNode<E> find(E data) {
         return find(root, data);
     }
 
-    private Node<E> lca(BiNode<E> node, BiNode<E> a, BiNode<E> b) {
+    private BiNode<E> lca(BiNode<E> node, BiNode<E> a, BiNode<E> b) {
         if (node == null || node == a || node == b)
             return node;
-        Node<E> x = lca(node.lc, a, b), y = lca(node.rc, a, b);
+            BiNode<E> x = lca(node.lc, a, b), y = lca(node.rc, a, b);
         if (x != null && y != null) return node; // 返回 node 作为公共祖先
         else return x != null ? x : y; // 传递结果
     }
 
-    public Node<E> lca(Node<E> a, Node<E> b) {
-        if (a instanceof BiNode && b instanceof BiNode)
-            return lca(root, (BiNode<E>)a, (BiNode<E>)b);
-        else
-            throw new InvalidParameterException();
+    /**
+     * @return 最近公共祖先
+     */
+    public BiNode<E> lca(BiNode<E> a, BiNode<E> b) {
+        return lca(root, a, b);
     }
 
     private boolean equals(BiNode<E> a, BiNode<E> b) {
         return a == null && b == null || equals(a.lc, b.lc) || equals(a.rc, b.rc);
     }
 
-    public boolean equals(Tree<E> anotherTree) {
-        if (anotherTree instanceof BiTree)
-            return equals(root, (BiNode<E>)anotherTree.getRoot());
-        else
-            throw new InvalidParameterException();
+    /**
+     * 比较两棵树结构是否相同
+     * @param anotherTree
+     * @return
+     */
+    public boolean equals(BiTree<E> anotherTree) {
+        return equals(root, anotherTree.getRoot());
     }
 
 }

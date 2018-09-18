@@ -15,62 +15,62 @@ public class TestBiTree {
     
     @Test
     public void test() {
-        Tree<Integer> biTree = new BiTree<>((a, b) -> Math.max(a, b), (a, b) -> a + b);
+        BiTree<Integer> BiTree = new BiTree<>((a, b) -> Math.max(a, b), (a, b) -> a + b);
         for (int i = 0; i < 11; i++)
-            biTree.add(i);
+            BiTree.add(i);
         
-        for (Integer i : biTree)
+        for (Integer i : BiTree)
             System.out.print(i + " ");
         System.out.println();
 
-        System.out.println("maxItem: " + biTree.maxItem());
-        System.out.println("search: " + biTree.search(8));
-        System.out.println("size: " + biTree.size());
-        System.out.println("height: " + biTree.height());
-        System.out.println("deepestNode: " + biTree.deepestNode());
-        System.out.println("equals: " + biTree.equals(biTree));
-        System.out.println("maxLayerSum: " + biTree.maxLayerSum());
-        System.out.println("hasPathSum: " + hasPathSum(biTree, 13));
-        System.out.println("sum: " + sum(biTree));
+        System.out.println("maxItem: " + BiTree.maxItem());
+        System.out.println("search: " + BiTree.search(8));
+        System.out.println("size: " + BiTree.size());
+        System.out.println("height: " + BiTree.height());
+        System.out.println("deepestBiNode: " + BiTree.deepestNode());
+        System.out.println("equals: " + BiTree.equals(BiTree));
+        System.out.println("maxLayerSum: " + BiTree.maxLayerSum());
+        System.out.println("hasPathSum: " + hasPathSum(BiTree, 13));
+        System.out.println("sum: " + sum(BiTree));
         
-        levelOrderTraversalInReverse(biTree);
-        allPathsFromRoot(biTree);
+        levelOrderTraversalInReverse(BiTree);
+        allPathsFromRoot(BiTree);
 
-        transforMirror(biTree);
-        System.out.println(biTree);
+        transforMirror(BiTree);
+        System.out.println(BiTree);
     }
 
     @Test
     public void test1() {
         Integer[] seq = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-        Tree<Integer> tree = new BiTree<>(seq);
-        System.out.println(tree);
+        BiTree<Integer> BiTree = new BiTree<>(seq);
+        System.out.println(BiTree);
 
-        Tree.Node<Integer> a = tree.find(10), b = tree.find(8), c = tree.lca(a, b);
+        BiTree.BiNode<Integer> a = BiTree.find(10), b = BiTree.find(8), c = BiTree.lca(a, b);
         System.out.println("lca: " + c);
 
-        System.out.println(zigzag(tree));
+        System.out.println(zigzag(BiTree));
 
-        tree.remove(3);
-        System.out.println(tree);
+        BiTree.remove(3);
+        System.out.println(BiTree);
     }
 
     /**
      * 逆向逐层输出数中元素
      */
-    private void levelOrderTraversalInReverse(Tree<Integer> tree) {
+    private void levelOrderTraversalInReverse(BiTree<Integer> BiTree) {
         Stack<Integer> s = new LinkedStack<>();
-        Queue<Tree.Node<Integer>> q = new LinkedQueue<>();
-        q.enQueue(tree.getRoot());
-        Tree.Node<Integer> node;
+        Queue<BiTree.BiNode<Integer>> q = new LinkedQueue<>();
+        q.enQueue(BiTree.getRoot());
+        BiTree.BiNode<Integer> BiNode;
         while (!q.isEmpty()) {
-            node = q.deQueue();
-            s.push(node.data);
-            if (node.getRightChild() != null)
-                q.enQueue(node.getRightChild());
-            if (node.getLeftChild() != null)
-                q.enQueue(node.getLeftChild());
+            BiNode = q.deQueue();
+            s.push(BiNode.data);
+            if (BiNode.rc != null)
+                q.enQueue(BiNode.rc);
+            if (BiNode.lc != null)
+                q.enQueue(BiNode.lc);
         }
         for (Integer elem : s)
             System.out.print(elem + " ");
@@ -80,18 +80,18 @@ public class TestBiTree {
     /**
      * 输出所有从根节点到叶子节点的路径
      */
-    private void allPathsFromRoot(Tree<Integer> tree) {
-        allPathsFromRoot(tree.getRoot(), "");
+    private void allPathsFromRoot(BiTree<Integer> BiTree) {
+        allPathsFromRoot(BiTree.getRoot(), "");
     }
 
-    private void allPathsFromRoot(Tree.Node<Integer> node, String prefix) {
-        if (node != null) {
-            String path = prefix + " -> " + node.data;
-            if (node.getLeftChild() == null && node.getRightChild() == null)
+    private void allPathsFromRoot(BiTree.BiNode<Integer> BiNode, String prefix) {
+        if (BiNode != null) {
+            String path = prefix + " -> " + BiNode.data;
+            if (BiNode.lc == null && BiNode.rc == null)
                 System.out.println(path);
             else {
-                allPathsFromRoot(node.getLeftChild(), path);
-                allPathsFromRoot(node.getRightChild(), path);
+                allPathsFromRoot(BiNode.lc, path);
+                allPathsFromRoot(BiNode.rc, path);
             }
         }
     }
@@ -99,14 +99,14 @@ public class TestBiTree {
     /**
      * 判断是否存在路径的数据和等于给定值
      */
-    private boolean hasPathSum(Tree<Integer> tree, int k) {
-        return hasPathSum(tree.getRoot(), 0, k);
+    private boolean hasPathSum(BiTree<Integer> BiTree, int k) {
+        return hasPathSum(BiTree.getRoot(), 0, k);
     }
 
-    private boolean hasPathSum(Tree.Node<Integer> node, int pre, int k) {
-        if (node != null) {
-            pre += node.data;
-            return pre == k || hasPathSum(node.getLeftChild(), pre, k) || hasPathSum(node.getRightChild(), pre, k);
+    private boolean hasPathSum(BiTree.BiNode<Integer> BiNode, int pre, int k) {
+        if (BiNode != null) {
+            pre += BiNode.data;
+            return pre == k || hasPathSum(BiNode.lc, pre, k) || hasPathSum(BiNode.rc, pre, k);
         }
         else return k == 0;
     }
@@ -114,60 +114,60 @@ public class TestBiTree {
     /**
      * 求所有节点数据之和
      */
-    private int sum(Tree<Integer> tree) {
-        return sum(tree.getRoot());
+    private int sum(BiTree<Integer> BiTree) {
+        return sum(BiTree.getRoot());
     }
 
-    private int sum(Tree.Node<Integer> node) {
-        if (node == null) return 0;
-        else return node.data + sum(node.getLeftChild()) + sum(node.getRightChild());
+    private int sum(BiTree.BiNode<Integer> BiNode) {
+        if (BiNode == null) return 0;
+        else return BiNode.data + sum(BiNode.lc) + sum(BiNode.rc);
     }
 
     /**
      * 转镜像
      */
-    private void transforMirror(Tree<Integer> tree) {
-        transforMirror(tree.getRoot());
+    private void transforMirror(BiTree<Integer> BiTree) {
+        transforMirror(BiTree.getRoot());
     }
 
-    private void transforMirror(Tree.Node<Integer> node) {
-        Tree.Node<Integer> tmp = node.getRightChild();
-        node.setRightChild(node.getLeftChild());
-        node.setLeftChild(tmp);
-        if (node.getRightChild() != null)
-            transforMirror(node.getRightChild());
-        if (node.getLeftChild() != null)
-            transforMirror(node.getLeftChild());
+    private void transforMirror(BiTree.BiNode<Integer> BiNode) {
+        BiTree.BiNode<Integer> tmp = BiNode.rc;
+        BiNode.rc = BiNode.lc;
+        BiNode.lc = tmp;
+        if (BiNode.rc != null)
+            transforMirror(BiNode.rc);
+        if (BiNode.lc != null)
+            transforMirror(BiNode.lc);
     }
 
     /**
      * Zigzag 遍历
      */
-    private List<Integer> zigzag(Tree<Integer> tree) {
+    private List<Integer> zigzag(BiTree<Integer> BiTree) {
         boolean leftFirst = false;
-        Tree.Node<Integer> node, a, b;
-        Queue<Tree.Node<Integer>> q = new LinkedQueue<>();
+        BiTree.BiNode<Integer> BiNode, a, b;
+        Queue<BiTree.BiNode<Integer>> q = new LinkedQueue<>();
         List<Integer> list = new LinkedList<>();
-        if ((node = tree.getRoot()) != null) {
-            list.add(node.data);
-            q.enQueue(node);
+        if ((BiNode = BiTree.getRoot()) != null) {
+            list.add(BiNode.data);
+            q.enQueue(BiNode);
             q.enQueue(null);
         }
         while (!q.isEmpty()) {
-            node = q.deQueue();
-            if (node == null) {
+            BiNode = q.deQueue();
+            if (BiNode == null) {
                 if (!q.isEmpty())
                     q.enQueue(null);
                 leftFirst = !leftFirst;
             }
             else {
                 if (leftFirst) {
-                    a = node.getLeftChild();
-                    b = node.getRightChild();
+                    a = BiNode.lc;
+                    b = BiNode.rc;
                 }
                 else {
-                    a = node.getRightChild();
-                    b = node.getLeftChild();
+                    a = BiNode.rc;
+                    b = BiNode.lc;
                 }
                 if (a != null) {
                     list.add(a.data);

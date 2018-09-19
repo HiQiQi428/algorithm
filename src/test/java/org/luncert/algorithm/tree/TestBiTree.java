@@ -145,29 +145,29 @@ public class TestBiTree {
      */
     private List<Integer> zigzag(BiTree<Integer> BiTree) {
         boolean leftFirst = false;
-        BiTree.BiNode<Integer> BiNode, a, b;
+        BiTree.BiNode<Integer> node, a, b;
         Queue<BiTree.BiNode<Integer>> q = new LinkedQueue<>();
         List<Integer> list = new LinkedList<>();
-        if ((BiNode = BiTree.getRoot()) != null) {
-            list.add(BiNode.data);
-            q.enQueue(BiNode);
+        if ((node = BiTree.getRoot()) != null) {
+            list.add(node.data);
+            q.enQueue(node);
             q.enQueue(null);
         }
         while (!q.isEmpty()) {
-            BiNode = q.deQueue();
-            if (BiNode == null) {
+            node = q.deQueue();
+            if (node == null) {
                 if (!q.isEmpty())
                     q.enQueue(null);
                 leftFirst = !leftFirst;
             }
             else {
                 if (leftFirst) {
-                    a = BiNode.lc;
-                    b = BiNode.rc;
+                    a = node.lc;
+                    b = node.rc;
                 }
                 else {
-                    a = BiNode.rc;
-                    b = BiNode.lc;
+                    a = node.rc;
+                    b = node.lc;
                 }
                 if (a != null) {
                     list.add(a.data);

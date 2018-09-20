@@ -7,6 +7,8 @@ public interface Adt<K, V> {
 
     void insert(K key, V value);
 
+    V delete(K key);
+
     V deleteMin();
 
     V deleteMax();
@@ -17,6 +19,6 @@ public interface Adt<K, V> {
 
     int size();
 
-    void sort();
-    
+    void clear();
+
 }

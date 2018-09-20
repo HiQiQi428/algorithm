@@ -39,20 +39,29 @@ public class BiHeap<K, V> implements Adt<K, V> {
         }
     }
 
+    private boolean percolatePart(int p, int c) {
+        Node<K, V> tmp;
+        int r = compare.apply(data[p].key, data[c].key);
+        if (isMinHeap && r > 0 || !isMinHeap && r < 0) {
+            tmp = data[p];
+            data[p] = data[c];
+            data[c] = tmp;
+            return true;
+        }
+        return false;
+    }
+
     private void percolateDown(int i) {
-        K tmp;
-        int r = 0, lc = i * 2 + 1, rc = i * 2 + 2;
-        
+        int lc = i * 2 + 1, rc = i * 2 + 2;
+        if (lc < size && percolatePart(i, lc))
+            percolateDown(lc);
+        if (rc < size && percolatePart(i, rc))
+            percolateDown(rc);
     }
 
     private void percolateUp(int i) {
-        K tmp;
-        int r = 0, parent = (i - 1) / 2;
-        while (isMinHeap && (r = compare.apply(data[parent].key, data[i].key)) > 0
-            || !isMinHeap && r < 0) {
-            tmp = data[parent].key;
-            data[i].key = data[parent].key;
-            data[parent].key = tmp;
+        int parent = (i - 1) / 2;
+        while (i > 0 && percolatePart(parent, i)) {
             i = parent;
             parent = (i - 1) / 2;
         }
@@ -60,59 +69,106 @@ public class BiHeap<K, V> implements Adt<K, V> {
 
     public void insert(K key, V value) {
         adjustCapacity();
-        Node<K,V> newNode = new Node<>(key, value);
-        data[size] = newNode;
+        data[size] = new Node<>(key, value);
         percolateUp(size++);
     }
 
-    private void minHeapCheck() {
+    private void sizeCheck() {
         if (size == 0)
-            throw new NoSuchElementException("deleteMin from empty heap");
-        if (!isMinHeap)
-            throw new UnsupportedOperationException("deleteMin from MaxHeap");
+            throw new UnsupportedOperationException("operation on empty heap");
     }
 
-    private void maxHeapCheck() {
-        if (size == 0)
-            throw new NoSuchElementException("deleteMin from empty heap");
-        if (isMinHeap)
-            throw new UnsupportedOperationException("deleteMax from MinHeap");
+    private int getFristLeafNode() {
+        // 计算前 h - 1 层的容量和最后一层的节点数
+        int s1 = (int) (size - (Math.pow(Math.log(size), 2) - 1)), l = size - s1;
+        // 计算 h - 1 层叶子节点数
+        return (l % 2 == 0 ? l / 2 : l / 2 + 1) - 1;
     }
 
-    private V delete() {
-        V value = data[0].value;
-        data[0] = data[--size];
+    private int getMinFromLeafNode() {
+        int min = getFristLeafNode();
+        for (int i = min + 1; i < size; i++)
+            if (compare.apply(data[min].key, data[i].key) > 0)
+                min = i;
+        return min;
+    }
+
+    private int getMaxFromLeafNode() {
+        int max = getFristLeafNode();
+        for (int i = max + 1; i < size; i++)
+            if (compare.apply(data[max].key, data[i].key) < 0)
+                max = i;
+        return max;
+    }
+
+    private V delete(int i) {
+        V value = data[i].value;
+        data[i] = data[--size];
         data[size] = null;
-        percolateDown(0);
+        percolateDown(i);
         return value;
     }
 
+    public V delete(K key) {
+        sizeCheck();
+        Node<K,V> node;
+        for (int i = 0; i < size; i++) {
+            node = data[i];
+            if (node.key == key || node.key.equals(key)) {
+                V ret = node.value;
+                data[i] = data[--size];
+                data[size] = null;
+                percolateDown(i);
+                return ret;
+            }
+        }
+        return null;
+    }
+
     public V deleteMin() {
-        minHeapCheck();
-        return delete();
+        sizeCheck();
+        if (isMinHeap) return delete(0);
+        else return delete(getMinFromLeafNode());
     }
 
     public V deleteMax() {
-        maxHeapCheck();
-        return delete();
+        sizeCheck();
+        if (!isMinHeap) return delete(0);
+        else return delete(getMaxFromLeafNode());
     }
 
     public V getMinimum() {
-        minHeapCheck();
-        return data[0].value;
+        sizeCheck();
+        if (isMinHeap) return data[0].value;
+        else return data[getMinFromLeafNode()].value;
     }
 
     public V getMaximum() {
-        maxHeapCheck();
-        return data[0].value;
+        sizeCheck();
+        if (!isMinHeap)
+            return data[0].value;
+        else return data[getMaxFromLeafNode()].value;
     }
 
     public int size() {
         return size;
     }
 
-    public void sort() {
+    public void clear() {
+        data = null;
+        size = 0;
+    }
 
+    /**
+     * 堆排序
+     */
+    public static <E> void sort(E[] data, boolean useMinHeap, BiFunction<E, E, Integer> compare) {
+        Adt<E, E> adt = new BiHeap<>(useMinHeap, compare);
+        for (E d : data)
+            adt.insert(d, d);
+        for (int i = 0; i < data.length; i++)
+            if (useMinHeap) data[i] = adt.deleteMin();
+            else data[i] = adt.deleteMax();
     }
 
 }

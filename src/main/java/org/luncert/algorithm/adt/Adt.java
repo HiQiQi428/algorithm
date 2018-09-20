@@ -8,6 +8,8 @@ public interface Adt<K, V> {
     void insert(K key, V value);
 
     V delete(K key);
+ 
+    V delete(int i);
 
     V deleteMin();
 

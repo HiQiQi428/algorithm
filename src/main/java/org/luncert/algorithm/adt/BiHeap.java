@@ -101,7 +101,9 @@ public class BiHeap<K, V> implements Adt<K, V> {
         return max;
     }
 
-    private V delete(int i) {
+    public V delete(int i) {
+        if (i < 0 || i >= size)
+            throw new NoSuchElementException("index: " + i);
         V value = data[i].value;
         data[i] = data[--size];
         data[size] = null;

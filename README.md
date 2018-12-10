@@ -1,2 +1,10 @@
 # 我的算法学习之路
-nothing！
+----
+
+----
+
+* adt
+* list
+* queue
+* stack
+* tree
